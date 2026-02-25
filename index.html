@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python 爬蟲教學指引</title>
+  <meta name="description" content="從基礎到進階的 Python 網頁爬蟲教學，涵蓋 BeautifulSoup4、Playwright、Crawl4AI">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- CodeMirror for Syntax Highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="#" class="navbar-brand"><span class="icon">🕷️</span> 爬蟲教學</a>
+    <button class="hamburger" aria-label="選單">☰</button>
+    <ul class="nav-links">
+      <li><a href="#ch1">靜態 vs 動態</a></li>
+      <li><a href="#ch2">BeautifulSoup4</a></li>
+      <li><a href="#ch3">Playwright</a></li>
+      <li><a href="#ch4">Crawl4AI</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <h1>Python <span class="highlight">網頁爬蟲</span> 教學指引</h1>
+    <p>從零開始學習網頁爬蟲，掌握靜態、動態、AI 三種爬蟲技術</p>
+    <div class="hero-chips">
+      <span class="chip blue">📄 靜態爬蟲</span>
+      <span class="chip blue">⚡ 動態爬蟲</span>
+      <span class="chip blue">🤖 AI 爬蟲</span>
+      <span class="chip blue">🎯 實戰練習</span>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ============================================================ -->
+    <!-- Chapter 1: 靜態 vs 動態 -->
+    <!-- ============================================================ -->
+    <section class="section fade-in" id="ch1">
+      <div class="section-header">
+        <span class="section-number blue">1</span>
+        <h2 class="section-title">靜態與動態網頁的差別</h2>
+      </div>
+      <p class="section-desc">了解網頁的兩種類型，這是選擇爬蟲工具的關鍵基礎</p>
+
+      <!-- 概念對比 -->
+      <div class="card fade-in">
+        <span class="card-label concept">📚 核心概念</span>
+        <h3>什麼是靜態網頁？什麼是動態網頁？</h3>
+        <table class="compare-table">
+          <tr>
+            <th>比較項目</th>
+            <th>靜態網頁</th>
+            <th>動態網頁</th>
+          </tr>
+          <tr>
+            <td>內容載入</td>
+            <td>伺服器直接回傳完整 HTML</td>
+            <td>JavaScript 在瀏覽器端動態產生內容</td>
+          </tr>
+          <tr>
+            <td>F12 檢視原始碼</td>
+            <td>看到的與頁面一致</td>
+            <td>原始碼可能是空的，內容由 JS 填入</td>
+          </tr>
+          <tr>
+            <td>爬蟲方式</td>
+            <td><code>requests</code> + <code>bs4</code></td>
+            <td><code>playwright</code> / <code>selenium</code></td>
+          </tr>
+          <tr>
+            <td>速度</td>
+            <td>快（只需 HTTP 請求）</td>
+            <td>慢（需要啟動瀏覽器）</td>
+          </tr>
+          <tr>
+            <td>常見範例</td>
+            <td>維基百科、PTT、新聞網站</td>
+            <td>金石堂、蝦皮、Instagram</td>
+          </tr>
+        </table>
+        <div class="tech-box" style="margin-top:16px">
+          <h4>🔍 如何判斷？</h4>
+          <ol>
+            <li>在網頁按 <code>Ctrl+U</code>（檢視原始碼），如果能看到完整內容 → <b>靜態</b></li>
+            <li>在網頁按 <code>F12</code> → Elements，如果原始碼與畫面不同 → <b>動態</b></li>
+            <li>在終端用 <code>curl</code> 該網址，如果回傳有完整內容 → <b>靜態</b></li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- 互動編輯器 -->
+      <div class="card fade-in">
+        <span class="card-label practice">🎯 互動練習</span>
+        <h3>試試看：用 F12 觀察靜態與動態的差別</h3>
+        <p>切換下方的「靜態範例」與「動態範例」，按下 <code>F12</code> 開啟開發者工具，觀察 Elements 面板中 DOM 的變化。</p>
+
+        <div class="editor-container">
+          <div class="editor-tabs">
+            <button class="editor-tab active" id="tab-html">HTML</button>
+          </div>
+          <div class="editor-body">
+            <div class="editor-code">
+              <textarea id="editor-textarea" spellcheck="false"></textarea>
+            </div>
+            <div class="editor-preview">
+              <span class="editor-preview-label">預覽</span>
+              <iframe id="editor-preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+          </div>
+          <div class="editor-action-bar">
+            <button class="btn-run" id="btn-run">▶ 執行</button>
+            <button class="btn-switch active" id="btn-static">📄 靜態範例</button>
+            <button class="btn-switch" id="btn-dynamic">⚡ 動態範例</button>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <h4>💡 F12 練習任務</h4>
+          <ol>
+            <li>載入「靜態範例」→ 按 F12 → Elements → 找到 <code>class="price"</code> 的元素</li>
+            <li>切換到「動態範例」→ <b>按按鈕前</b>先看 Elements，找找 <code>#product-list</code> 裡有什麼</li>
+            <li>按下「📦 載入商品」按鈕後，再觀察 <code>#product-list</code> 的變化</li>
+            <li>思考：如果你用 <code>requests.get()</code> 去抓動態網頁，你會得到什麼？</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ============================================================ -->
+    <!-- Chapter 2: BeautifulSoup4 -->
+    <!-- ============================================================ -->
+    <section class="section fade-in" id="ch2">
+      <div class="section-header">
+        <span class="section-number blue">2</span>
+        <h2 class="section-title">靜態爬蟲：BeautifulSoup4</h2>
+      </div>
+      <p class="section-desc">使用 <code>requests</code> + <code>bs4</code> 爬取靜態網頁的資料</p>
+
+      <!-- 技術知識 -->
+      <div class="card fade-in">
+        <span class="card-label tech">🔧 技術知識</span>
+        <h3>BeautifulSoup4 核心概念</h3>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span> 安裝套件</div>
+          <div class="step"><span class="step-num">2</span> 發送請求</div>
+          <div class="step"><span class="step-num">3</span> 解析 HTML</div>
+          <div class="step"><span class="step-num">4</span> 擷取資料</div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="btn-copy">📋 複製</button>
+          </div>
+          <pre><code><span class="cm"># 安裝套件</span>
+pip install requests beautifulsoup4</code></pre>
+        </div>
+
+        <div class="tech-box">
+          <h4>📖 常用方法速查</h4>
+          <ul>
+            <li><code>soup.find('tag')</code> — 找到第一個符合的元素</li>
+            <li><code>soup.find_all('tag')</code> — 找到所有符合的元素</li>
+            <li><code>soup.select('css selector')</code> — 用 CSS 選擇器找元素</li>
+            <li><code>element.text</code> — 取得元素的文字內容</li>
+            <li><code>element['href']</code> — 取得元素的屬性值</li>
+            <li><code>element.get('class')</code> — 安全地取得屬性（不存在不報錯）</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 練習 1: 維基百科藍染 -->
+      <div class="card fade-in">
+        <span class="card-label practice">🎯 練習題 A</span>
+        <h3>爬取維基百科「藍染」頁面</h3>
+        <p>目標網址：<a class="target-link" href="https://zh.wikipedia.org/zh-tw/藍染" target="_blank">🔗
+            zh.wikipedia.org/zh-tw/藍染</a></p>
+
+        <div class="exercise-goal">
+          <span class="icon">🎯</span>
+          <div>
+            <p>練習目標</p>
+            <ul style="margin-top:4px">
+              <li>爬取頁面中所有的<b>章節標題</b>（h2, h3）</li>
+              <li>爬取<b>第一張圖片</b>的網址</li>
+              <li>爬取頁面中的<b>表格與圖片網格（畫廊）資料</b>，包含圖片網址並整理成清單</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="collapsible">
+          <button class="collapsible-trigger"><span class="arrow">▶</span> 查看參考程式碼</button>
+          <div class="collapsible-content">
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">python</span>
+                <button class="btn-copy">📋 複製</button>
+              </div>
+              <pre><code><span class="kw">import</span> requests
+<span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+<span class="cm"># 1. 發送請求</span>
+url = <span class="str">"https://zh.wikipedia.org/zh-tw/藍染"</span>
+headers = {<span class="str">"User-Agent"</span>: <span class="str">"Mozilla/5.0"</span>}
+response = requests.get(url, headers=headers)
+
+<span class="cm"># 2. 解析 HTML</span>
+soup = BeautifulSoup(response.text, <span class="str">"html.parser"</span>)
+
+<span class="cm"># 3. 爬取所有章節標題</span>
+<span class="kw">for</span> heading <span class="kw">in</span> soup.select(<span class="str">".mw-heading h2, .mw-heading h3"</span>):
+    <span class="fn">print</span>(<span class="str">"📌"</span>, heading.text.strip())
+
+<span class="cm"># 4. 爬取第一張圖片</span>
+img = soup.select_one(<span class="str">".mw-body-content img"</span>)
+<span class="kw">if</span> img:
+    <span class="fn">print</span>(<span class="str">"🖼️ 圖片:"</span>, <span class="str">"https:"</span> + img[<span class="str">"src"</span>])
+
+<span class="cm"># 5. 爬取表格與畫廊 (圖片網格) 資料</span>
+<span class="fn">print</span>(<span class="str">"\n📊 表格與畫廊資料："</span>)
+
+<span class="cm"># 處理傳統表格 (.wikitable)</span>
+<span class="kw">for</span> i, table <span class="kw">in</span> <span class="fn">enumerate</span>(soup.select(<span class="str">"table.wikitable"</span>), <span class="num">1</span>):
+    <span class="fn">print</span>(<span class="str">f"\n--- 第 {i} 個表格 ---"</span>)
+    <span class="kw">for</span> row <span class="kw">in</span> table.find_all(<span class="str">"tr"</span>):
+        row_data = [col.text.strip() <span class="kw">for</span> col <span class="kw">in</span> row.find_all([<span class="str">"th"</span>, <span class="str">"td"</span>])]
+        <span class="kw">if</span> <span class="fn">any</span>(row_data): <span class="fn">print</span>(<span class="str">" | "</span>.join(row_data))
+
+<span class="cm"># 處理畫廊 (排版上像表格的圖片網格)</span>
+<span class="kw">for</span> i, gallery <span class="kw">in</span> <span class="fn">enumerate</span>(soup.select(<span class="str">"ul.gallery"</span>), <span class="num">1</span>):
+    <span class="fn">print</span>(<span class="str">f"\n--- 第 {i} 個圖片網格 (Gallery) ---"</span>)
+    <span class="kw">for</span> box <span class="kw">in</span> gallery.select(<span class="str">".gallerybox"</span>):
+        caption = box.select_one(<span class="str">".gallerytext"</span>)
+        img = box.select_one(<span class="str">"img"</span>)
+        
+        caption_text = caption.text.strip() <span class="kw">if</span> caption <span class="kw">else</span> <span class="str">"無說明"</span>
+        img_url = <span class="str">"https:"</span> + img[<span class="str">"src"</span>] <span class="kw">if</span> img <span class="kw">and</span> img.get(<span class="str">"src"</span>) <span class="kw">else</span> <span class="str">"無圖片"</span>
+        <span class="fn">print</span>(<span class="str">f"🔹 {caption_text} (圖片: {img_url})"</span>)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <h4>💡 AI Prompt 提示</h4>
+          <p>你可以把以下 prompt 貼給 AI 助手來完成這個練習：</p>
+          <div class="code-block" style="margin-top:12px">
+            <div class="code-block-header">
+              <span class="code-block-lang">prompt</span>
+              <button class="btn-copy">📋 複製</button>
+            </div>
+            <pre><code>請幫我寫一個 Python 爬蟲，使用 requests 和 BeautifulSoup4：
+1. 目標網址：https://zh.wikipedia.org/zh-tw/藍染
+2. 爬取所有 h2 和 h3 的章節標題
+3. 爬取頁面上所有圖片的網址
+4. 將表格以及畫廊 (圖片網格) 內容整理成清單格式，包含說明文字與圖片網址
+5. 記得加上 User-Agent header
+6. 將結果存成 JSON 檔案</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 練習 2: PTT -->
+      <div class="card fade-in">
+        <span class="card-label practice">🎯 練習題 B</span>
+        <h3>爬取 PTT 電影版文章列表</h3>
+        <p>目標網址：<a class="target-link" href="https://www.ptt.cc/bbs/movie/index.html" target="_blank">🔗
+            ptt.cc/bbs/movie/index.html</a></p>
+
+        <div class="exercise-goal">
+          <span class="icon">🎯</span>
+          <div>
+            <p>練習目標</p>
+            <ul style="margin-top:4px">
+              <li>爬取文章的<b>標題、作者、日期</b></li>
+              <li>爬取文章的<b>推文數量</b></li>
+              <li>實作<b>翻頁功能</b>（爬取前 3 頁）</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tech-box">
+          <h4>⚠️ 注意事項</h4>
+          <ul>
+            <li>PTT 需要帶上 Cookie：<code>over18=1</code>（已滿 18 歲驗證）</li>
+            <li>翻頁的網址在「上一頁」的超連結中</li>
+            <li>有些文章可能被刪除，要加上錯誤處理</li>
+          </ul>
+        </div>
+
+        <div class="collapsible">
+          <button class="collapsible-trigger"><span class="arrow">▶</span> 查看參考程式碼</button>
+          <div class="collapsible-content">
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">python</span>
+                <button class="btn-copy">📋 複製</button>
+              </div>
+              <pre><code><span class="kw">import</span> requests
+<span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+url = <span class="str">"https://www.ptt.cc/bbs/movie/index.html"</span>
+cookies = {<span class="str">"over18"</span>: <span class="str">"1"</span>}
+
+<span class="kw">for</span> page <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>):
+    resp = requests.get(url, cookies=cookies)
+    soup = BeautifulSoup(resp.text, <span class="str">"html.parser"</span>)
+
+    <span class="kw">for</span> entry <span class="kw">in</span> soup.select(<span class="str">".r-ent"</span>):
+        title_el = entry.select_one(<span class="str">".title a"</span>)
+        <span class="kw">if</span> <span class="kw">not</span> title_el:
+            <span class="kw">continue</span>
+        push = entry.select_one(<span class="str">".nrec span"</span>)
+        author = entry.select_one(<span class="str">".meta .author"</span>)
+        date = entry.select_one(<span class="str">".meta .date"</span>)
+        <span class="fn">print</span>(<span class="str">f"[</span>{push.text <span class="kw">if</span> push <span class="kw">else</span> <span class="str">' '</span>}<span class="str">] </span>{title_el.text.strip()}<span class="str"> - </span>{author.text <span class="kw">if</span> author <span class="kw">else</span> <span class="str">'N/A'</span>}<span class="str">"</span>)
+
+    <span class="cm"># 取得上一頁的連結</span>
+    prev_link = soup.select(<span class="str">".btn-group-paging a"</span>)[<span class="num">1</span>][<span class="str">"href"</span>]
+    url = <span class="str">"https://www.ptt.cc"</span> + prev_link</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <h4>💡 AI Prompt 提示</h4>
+          <div class="code-block" style="margin-top:12px">
+            <div class="code-block-header">
+              <span class="code-block-lang">prompt</span>
+              <button class="btn-copy">📋 複製</button>
+            </div>
+            <pre><code>請幫我寫一個 Python 爬蟲，爬取 PTT 電影版的文章列表：
+1. 網址：https://www.ptt.cc/bbs/movie/index.html
+2. 需要處理「已滿 18 歲」的 Cookie 驗證
+3. 爬取每篇文章的標題、作者、日期、推文數
+4. 實作翻頁功能，爬取最近 3 頁的文章
+5. 將結果存成 CSV 檔案
+6. 加上適當的錯誤處理和延遲（避免被封鎖）</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ============================================================ -->
+    <!-- Chapter 3: Playwright -->
+    <!-- ============================================================ -->
+    <section class="section fade-in" id="ch3">
+      <div class="section-header">
+        <span class="section-number blue">3</span>
+        <h2 class="section-title">動態爬蟲：Playwright</h2>
+      </div>
+      <p class="section-desc">使用 Playwright 控制瀏覽器，爬取 JavaScript 動態渲染的網頁</p>
+
+      <!-- 技術知識 -->
+      <div class="card fade-in">
+        <span class="card-label tech">🔧 技術知識</span>
+        <h3>Playwright 核心概念</h3>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="btn-copy">📋 複製</button>
+          </div>
+          <pre><code><span class="cm"># 安裝 Playwright</span>
+pip install playwright
+playwright install chromium</code></pre>
+        </div>
+
+        <div class="tech-box">
+          <h4>📖 Playwright 重要觀念</h4>
+          <ul>
+            <li><b>無頭模式 (headless)</b>：不開啟瀏覽器視窗，速度更快</li>
+            <li><b>等待機制</b>：<code>page.wait_for_selector()</code> 等待元素出現</li>
+            <li><b>截圖功能</b>：<code>page.screenshot()</code> 擷取當前畫面</li>
+            <li><b>模擬操作</b>：<code>page.click()</code>、<code>page.fill()</code> 模擬點擊與輸入</li>
+            <li><b>同步 API</b>：使用 <code>sync_playwright()</code>，初學者更好上手</li>
+          </ul>
+        </div>
+
+        <div class="collapsible">
+          <button class="collapsible-trigger"><span class="arrow">▶</span> 查看基本模板</button>
+          <div class="collapsible-content">
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">python</span>
+                <button class="btn-copy">📋 複製</button>
+              </div>
+              <pre><code><span class="kw">from</span> playwright.sync_api <span class="kw">import</span> sync_playwright
+
+<span class="kw">with</span> sync_playwright() <span class="kw">as</span> p:
+    <span class="cm"># 啟動瀏覽器（headless=False 可看到操作過程）</span>
+    browser = p.chromium.launch(headless=<span class="num">False</span>)
+    page = browser.new_page()
+
+    <span class="cm"># 前往目標網頁</span>
+    page.goto(<span class="str">"https://example.com"</span>)
+
+    <span class="cm"># 等待特定元素載入</span>
+    page.wait_for_selector(<span class="str">".content"</span>)
+
+    <span class="cm"># 擷取資料</span>
+    items = page.query_selector_all(<span class="str">".item"</span>)
+    <span class="kw">for</span> item <span class="kw">in</span> items:
+        <span class="fn">print</span>(item.inner_text())
+
+    <span class="cm"># 截圖存證</span>
+    page.screenshot(path=<span class="str">"result.png"</span>)
+    browser.close()</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 練習 1: 金石堂 -->
+      <div class="card fade-in">
+        <span class="card-label practice">🎯 練習題 A</span>
+        <h3>爬取金石堂暢銷書排行榜</h3>
+        <p>目標網址：<a class="target-link" href="https://www.kingstone.com.tw/bestseller/best/book/" target="_blank">🔗
+            kingstone.com.tw 暢銷排行榜</a></p>
+
+        <div class="exercise-goal">
+          <span class="icon">🎯</span>
+          <div>
+            <p>練習目標</p>
+            <ul style="margin-top:4px">
+              <li>爬取暢銷書的<b>排名、書名、作者、價格</b></li>
+              <li>嘗試切換不同分類（文學、商業...）</li>
+              <li>將結果整理成表格並存成 CSV</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tech-box">
+          <h4>⚠️ 為什麼要用 Playwright？</h4>
+          <p>金石堂的書籍排行資料是透過 JavaScript 動態載入的。如果用 <code>requests.get()</code> 抓取，會發現回傳的 HTML 裡不包含書籍資料。必須用 Playwright 等待
+            JavaScript 執行完畢後才能擷取。</p>
+        </div>
+
+        <div class="collapsible">
+          <button class="collapsible-trigger"><span class="arrow">▶</span> 查看參考程式碼</button>
+          <div class="collapsible-content">
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">python</span>
+                <button class="btn-copy">📋 複製</button>
+              </div>
+              <pre><code><span class="kw">from</span> playwright.sync_api <span class="kw">import</span> sync_playwright
+<span class="kw">import</span> csv
+
+<span class="kw">with</span> sync_playwright() <span class="kw">as</span> p:
+    browser = p.chromium.launch(headless=<span class="num">False</span>)
+    page = browser.new_page()
+    page.goto(<span class="str">"https://www.kingstone.com.tw/bestseller/best/book/"</span>)
+
+    <span class="cm"># 等待書籍列表載入</span>
+    page.wait_for_selector(<span class="str">".modProList"</span>, timeout=<span class="num">10000</span>)
+    page.wait_for_timeout(<span class="num">2000</span>)  <span class="cm"># 額外等待確保完全載入</span>
+
+    <span class="cm"># 擷取書籍資訊</span>
+    books = page.query_selector_all(<span class="str">".modProList"</span>)
+    results = []
+    <span class="kw">for</span> i, book <span class="kw">in</span> <span class="fn">enumerate</span>(books, <span class="num">1</span>):
+        title = book.query_selector(<span class="str">".modProName"</span>)
+        author = book.query_selector(<span class="str">".modProAuthor"</span>)
+        price = book.query_selector(<span class="str">".priceset"</span>)
+        results.append({
+            <span class="str">"排名"</span>: i,
+            <span class="str">"書名"</span>: title.inner_text() <span class="kw">if</span> title <span class="kw">else</span> <span class="str">"N/A"</span>,
+            <span class="str">"作者"</span>: author.inner_text() <span class="kw">if</span> author <span class="kw">else</span> <span class="str">"N/A"</span>,
+            <span class="str">"價格"</span>: price.inner_text() <span class="kw">if</span> price <span class="kw">else</span> <span class="str">"N/A"</span>,
+        })
+        <span class="fn">print</span>(<span class="str">f"#{i} {results[-1]['書名']}"</span>)
+
+    <span class="cm"># 截圖 & 關閉</span>
+    page.screenshot(path=<span class="str">"kingstone_bestseller.png"</span>, full_page=<span class="num">True</span>)
+    browser.close()</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <h4>💡 AI Prompt 提示</h4>
+          <div class="code-block" style="margin-top:12px">
+            <div class="code-block-header">
+              <span class="code-block-lang">prompt</span>
+              <button class="btn-copy">📋 複製</button>
+            </div>
+            <pre><code>請用 Python Playwright 幫我爬取金石堂暢銷書排行榜：
+1. 網址：https://www.kingstone.com.tw/bestseller/best/book/
+2. 這是動態網頁，需要等待 JS 載入完成
+3. 爬取每本書的排名、書名、作者、價格
+4. 使用 headless=False 讓我看到操作過程
+5. 將結果存成 CSV 檔案
+6. 截圖保存頁面畫面作為記錄</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 練習 2: 環保回收 -->
+      <div class="card fade-in">
+        <span class="card-label practice">🎯 練習題 B</span>
+        <h3>爬取回收大百科並建立 AI 訓練資料集</h3>
+        <p>目標網址：<a class="target-link" href="https://recycle.rethinktw.org/trash/1/" target="_blank">🔗
+            recycle.rethinktw.org/trash</a></p>
+
+        <div class="exercise-goal">
+          <span class="icon">🎯</span>
+          <div>
+            <p>練習目標</p>
+            <ul style="margin-top:4px">
+              <li>目標是為 LLM (大型語言模型) 建立乾淨的資料集</li>
+              <li>爬取特定按鈕與深層文字（如：<b>價值、材質、說明</b>）</li>
+              <li>處理 SPA (單頁應用) 的動態載入延遲問題</li>
+              <li>將資料結構化並匯出成 <b>JSON 格式</b></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tech-box">
+          <h4>⚠️ 動態載入的等待技巧</h4>
+          <p>在許多現代網頁 (如 React/Vue 建立的 SPA) 裡，網頁標題和結構可能會在 JavaScript 渲染前短暫呈現空白或預設文字。必須善用 <code>wait_for_selector</code>
+            來確保資料確實出現在畫面上後再開始擷取。</p>
+        </div>
+
+        <div class="collapsible">
+          <button class="collapsible-trigger"><span class="arrow">▶</span> 查看參考程式碼</button>
+          <div class="collapsible-content">
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">python</span>
+                <button class="btn-copy">📋 複製</button>
+              </div>
+              <pre><code><span class="kw">import</span> json
+<span class="kw">from</span> playwright.sync_api <span class="kw">import</span> sync_playwright
+
+<span class="kw">def</span> <span class="fn">scrape_rethink_details</span>(urls):
+    results = []
+    <span class="kw">with</span> sync_playwright() <span class="kw">as</span> p:
+        browser = p.chromium.launch(headless=<span class="num">False</span>)
+        page = browser.new_page()
+        
+        <span class="kw">for</span> url <span class="kw">in</span> urls:
+            <span class="fn">print</span>(<span class="str">f"🌍 正在爬取：{url}"</span>)
+            page.goto(url, wait_until=<span class="str">"domcontentloaded"</span>, timeout=<span class="num">30000</span>)
+            page.wait_for_selector(<span class="str">"h1"</span>, timeout=<span class="num">15000</span>)
+            page.wait_for_timeout(<span class="num">1500</span>) <span class="cm"># 等待動態元件渲染</span>
+                
+            <span class="cm"># 1. 垃圾名稱</span>
+            title_el = page.query_selector(<span class="str">"h1"</span>)
+            title = title_el.inner_text().strip() <span class="kw">if</span> title_el <span class="kw">else</span> <span class="str">"未知名稱"</span>
+            
+            <span class="cm"># 2. 價值與說明</span>
+            value_els = page.query_selector_all(<span class="str">"span, p, div"</span>)
+            value = <span class="str">""</span>
+            <span class="kw">for</span> el <span class="kw">in</span> value_els:
+                text = el.inner_text().strip()
+                <span class="kw">if</span> <span class="str">"高回收價值"</span> <span class="kw">in</span> text: value = <span class="str">"高回收價值"</span>
+                <span class="kw">elif</span> <span class="str">"低回收價值"</span> <span class="kw">in</span> text: value = <span class="str">"低回收價值"</span>
+                <span class="kw">if</span> value: <span class="kw">break</span>
+
+            desc_els = page.query_selector_all(<span class="str">"p.chakra-text"</span>)
+            description = <span class="fn">max</span>([el.inner_text().strip() <span class="kw">for</span> el <span class="kw">in</span> desc_els], key=<span class="fn">len</span>, default=<span class="str">""</span>)
+                    
+            item_data = {
+                <span class="str">"name"</span>: title,
+                <span class="str">"value"</span>: value,
+                <span class="str">"description"</span>: description,
+                <span class="str">"url"</span>: url
+            }
+            results.append(item_data)
+            
+        browser.close()
+    <span class="kw">return</span> results
+
+<span class="cm"># 執行擷取並存成 JSON</span>
+urls = [<span class="str">"https://recycle.rethinktw.org/trash/1/"</span>, <span class="str">"https://recycle.rethinktw.org/trash/115/"</span>]
+data = scrape_rethink_details(urls)
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"rethink_data.json"</span>, <span class="str">"w"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    json.dump(data, f, ensure_ascii=<span class="num">False</span>, indent=<span class="num">2</span>)</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <h4>💡 AI Prompt 提示</h4>
+          <div class="code-block" style="margin-top:12px">
+            <div class="code-block-header">
+              <span class="code-block-lang">prompt</span>
+              <button class="btn-copy">📋 複製</button>
+            </div>
+            <pre><code>請用 Playwright 爬取回收大百科的垃圾處理資訊：
+1. 目標網址：https://recycle.rethinktw.org/trash/1/ 等多個頁面
+2. 這是動態載入的 SPA 網頁，需要明確等待標題 h1 出現
+3. 爬取垃圾名稱、回收價值（從 span 或 div 中尋找「高回收價值」或「低回收價值」字樣）
+4. 爬取垃圾的詳細說明（取得頁面中最長的一段 p.chakra-text 文字）
+5. 將爬抓結果整理為結構化的字典清單
+6. 將最終資料匯出成 JSON 檔案 (rethink_data.json)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ============================================================ -->
+    <!-- Chapter 4: Crawl4AI -->
+    <!-- ============================================================ -->
+    <section class="section fade-in" id="ch4">
+      <div class="section-header">
+        <span class="section-number blue">4</span>
+        <h2 class="section-title">AI 爬蟲：Crawl4AI</h2>
+      </div>
+      <p class="section-desc">使用 AI 自動理解網頁結構並提取結構化資料</p>
+
+      <!-- 技術知識 -->
+      <div class="card fade-in">
+        <span class="card-label tech">🔧 技術知識</span>
+        <h3>Crawl4AI 核心概念</h3>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="btn-copy">📋 複製</button>
+          </div>
+          <pre><code><span class="cm"># 安裝 Crawl4AI</span>
+pip install crawl4ai
+crawl4ai-setup  <span class="cm"># 安裝瀏覽器引擎</span></code></pre>
+        </div>
+
+        <div class="tech-box">
+          <h4>📖 Crawl4AI 是什麼？</h4>
+          <ul>
+            <li><b>AI 驅動</b>：利用 LLM 自動理解網頁結構，不需手動寫 CSS Selector</li>
+            <li><b>結構化輸出</b>：可定義 Schema，讓 AI 按格式回傳資料（JSON）</li>
+            <li><b>Markdown 輸出</b>：自動將網頁轉成乾淨的 Markdown 格式</li>
+            <li><b>支援動態網頁</b>：內建瀏覽器引擎，可處理 JavaScript 渲染</li>
+            <li><b>Extraction Strategy</b>：使用 <code>LLMExtractionStrategy</code> 讓 AI 決定如何擷取</li>
+          </ul>
+        </div>
+
+        <div class="collapsible">
+          <button class="collapsible-trigger"><span class="arrow">▶</span> 查看基本模板</button>
+          <div class="collapsible-content">
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">python</span>
+                <button class="btn-copy">📋 複製</button>
+              </div>
+              <pre><code><span class="kw">import</span> asyncio
+<span class="kw">from</span> crawl4ai <span class="kw">import</span> AsyncWebCrawler, CrawlerRunConfig
+<span class="kw">from</span> crawl4ai.extraction_strategy <span class="kw">import</span> LLMExtractionStrategy
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    config = CrawlerRunConfig(
+        extraction_strategy=LLMExtractionStrategy(
+            provider=<span class="str">"openai/gpt-4o-mini"</span>,
+            instruction=<span class="str">"擷取所有商品名稱和價格，以 JSON 格式回傳"</span>,
+        )
+    )
+    <span class="kw">async with</span> AsyncWebCrawler() <span class="kw">as</span> crawler:
+        result = <span class="kw">await</span> crawler.arun(
+            url=<span class="str">"https://example.com/products"</span>,
+            config=config,
+        )
+        <span class="fn">print</span>(result.extracted_content)
+
+asyncio.run(main())</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 練習: 價格爬取 -->
+      <div class="card fade-in">
+        <span class="card-label practice">🎯 練習題</span>
+        <h3>用 AI 解析商品價格資訊</h3>
+        <p>目標：了解大型電商網站（如 Momo）結構龐大容易導致 AI 解析超時或觸發 Rate Limit 的限制，並學習改用簡易的教學模板（<code>demo.html</code>）配合 Live Server
+          進行高速且不受阻礙的本機測試。</p>
+
+        <div class="exercise-goal">
+          <span class="icon">🎯</span>
+          <div>
+            <p>練習目標</p>
+            <ul style="margin-top:4px">
+              <li>用 Crawl4AI 將網頁轉成 <b>Markdown</b> 格式</li>
+              <li>使用 <b>LLM Extraction</b> 自動擷取商品名稱與價格</li>
+              <li>用 <b>JsonCssExtractionStrategy</b> 或 <b>LLMExtractionStrategy</b> 定義資料結構</li>
+              <li>比較 AI 爬蟲與傳統爬蟲的差異</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="collapsible">
+          <button class="collapsible-trigger"><span class="arrow">▶</span> 方法一：Markdown 模式（不需 API Key）</button>
+          <div class="collapsible-content">
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">python</span>
+                <button class="btn-copy">📋 複製</button>
+              </div>
+              <pre><code><span class="kw">import</span> asyncio
+<span class="kw">from</span> crawl4ai <span class="kw">import</span> AsyncWebCrawler, CrawlerRunConfig
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    config = CrawlerRunConfig(
+        word_count_threshold=<span class="num">10</span>,  <span class="cm"># 過濾太短的內容</span>
+    )
+    <span class="kw">async with</span> AsyncWebCrawler() <span class="kw">as</span> crawler:
+        result = <span class="kw">await</span> crawler.arun(
+            url=<span class="str">"http://127.0.0.1:5500/demo.html"</span>, <span class="cm"># ⚠️ 請先使用 Live Server 啟動準備好的本地教學靶機網頁</span>
+            config=config,
+        )
+        <span class="cm"># 輸出乾淨的 Markdown</span>
+        <span class="fn">print</span>(result.markdown)
+
+        <span class="cm"># 也可以看網頁上所有的連結</span>
+        <span class="kw">for</span> link <span class="kw">in</span> result.links[<span class="str">"internal"</span>][:10]:
+            <span class="fn">print</span>(<span class="str">"🔗"</span>, link[<span class="str">"text"</span>], link[<span class="str">"href"</span>])
+
+asyncio.run(main())</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="collapsible">
+          <button class="collapsible-trigger"><span class="arrow">▶</span> 方法二：LLM 模式（需要 API Key）</button>
+          <div class="collapsible-content">
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">python</span>
+                <button class="btn-copy">📋 複製</button>
+              </div>
+              <pre><code><span class="kw">import</span> asyncio, json, os
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> crawl4ai <span class="kw">import</span> AsyncWebCrawler, CrawlerRunConfig, LLMConfig
+<span class="kw">from</span> crawl4ai.extraction_strategy <span class="kw">import</span> LLMExtractionStrategy
+
+<span class="kw">class</span> <span class="fn">Product</span>(BaseModel):
+    name: <span class="kw">str</span> = Field(description=<span class="str">"商品的完整名稱"</span>)
+    price: <span class="kw">str</span> = Field(description=<span class="str">"商品的價格數值"</span>)
+    link: <span class="kw">str</span> = Field(description=<span class="str">"商品的超連結網址"</span>)
+
+<span class="cm"># 設定 API Key（或用環境變數）</span>
+os.environ[<span class="str">"GEMINI_API_KEY"</span>] = <span class="str">"your-gemini-api-key"</span>
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    llm_config = LLMConfig(provider=<span class="str">"gemini/gemini-2.5-flash"</span>)
+    strategy = LLMExtractionStrategy(
+        llm_config=llm_config,
+        schema=Product.model_json_schema(),
+        instruction=<span class="str">"從這個網頁中擷取所有重點商品資訊，並嚴格遵循提供的 schema 回傳 JSON 陣列"</span>,
+    )
+    config = CrawlerRunConfig(
+        extraction_strategy=strategy,
+        css_selector=".listArea",  <span class="cm"># 💡 若解析真實大型電商，可利用此過濾器刪減廣告避免中斷；本地靶機則非必要</span>
+    )
+
+    <span class="kw">async with</span> AsyncWebCrawler() <span class="kw">as</span> crawler:
+        result = <span class="kw">await</span> crawler.arun(
+            url=<span class="str">"http://127.0.0.1:5500/demo.html"</span>, <span class="cm"># ⚠️ 針對教學示範本機網頁進行解析</span>
+            config=config,
+        )
+        data = json.loads(result.extracted_content)
+        <span class="kw">for</span> item <span class="kw">in</span> data:
+            <span class="fn">print</span>(<span class="str">f"📦 {item.get('name', 'N/A')} — 💰 {item.get('price', 'N/A')}"</span>)
+
+asyncio.run(main())</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <h4>💡 AI Prompt 提示</h4>
+          <div class="code-block" style="margin-top:12px">
+            <div class="code-block-header">
+              <span class="code-block-lang">prompt</span>
+              <button class="btn-copy">📋 複製</button>
+            </div>
+            <pre><code>請用 Crawl4AI 幫我解析本地端的「暢銷商品排行榜」教學網頁：
+1. 指導如何先製作一支簡短的 demo.html，包含十幾個商品清單片段
+2. 使用 AsyncWebCrawler 搭配 Live Server 測試網址 (http://127.0.0.1:5500/demo.html)
+3. 示範免 API Key 的 Markdown 模式，看看純文字無干擾的網頁結構
+4. 導入 pydantic 建立 BaseModel (包含 name, price, link 等屬性欄位)
+5. 使用 LLMExtractionStrategy，並傳入 schema=Product.model_json_schema() 以強制 AI 遵守目標 JSON 格式
+6. 將結果提取並整理印出在終端機</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 三種工具比較 -->
+      <div class="card fade-in">
+        <span class="card-label concept">📚 總結比較</span>
+        <h3>三種爬蟲技術比較</h3>
+        <table class="compare-table">
+          <tr>
+            <th>項目</th>
+            <th>BeautifulSoup4</th>
+            <th>Playwright</th>
+            <th>Crawl4AI</th>
+          </tr>
+          <tr>
+            <td>適用場景</td>
+            <td>靜態 HTML 網頁</td>
+            <td>動態 JS 網頁</td>
+            <td>任何網頁 + AI 解析</td>
+          </tr>
+          <tr>
+            <td>學習難度</td>
+            <td><span class="tag easy">簡單</span></td>
+            <td><span class="tag medium">中等</span></td>
+            <td><span class="tag easy">簡單</span></td>
+          </tr>
+          <tr>
+            <td>速度</td>
+            <td>⚡ 很快</td>
+            <td>🐢 較慢</td>
+            <td>🐢 較慢（含 AI）</td>
+          </tr>
+          <tr>
+            <td>需要瀏覽器</td>
+            <td>❌ 不需要</td>
+            <td>✅ 需要</td>
+            <td>✅ 需要</td>
+          </tr>
+          <tr>
+            <td>需要寫選擇器</td>
+            <td>✅ 需要手動</td>
+            <td>✅ 需要手動</td>
+            <td>❌ AI 自動判斷</td>
+          </tr>
+          <tr>
+            <td>費用</td>
+            <td>免費</td>
+            <td>免費</td>
+            <td>Markdown 免費 / LLM 需 API Key</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>🕷️ Python 爬蟲教學指引 — 祝你爬蟲愉快！</p>
+    <p style="margin-top:8px; font-size:13px">
+      使用工具：<a href="https://www.crummy.com/software/BeautifulSoup/" target="_blank">BeautifulSoup4</a> ·
+      <a href="https://playwright.dev/python/" target="_blank">Playwright</a> ·
+      <a href="https://github.com/unclecode/crawl4ai" target="_blank">Crawl4AI</a>
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
